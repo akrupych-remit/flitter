@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
@@ -31,9 +33,29 @@ class _MyHomePageState extends State<MyHomePage> {
               new SizeTransition(
                 sizeFactor: animation,
                 child: new ListTile(
-                    title: new Text(
-                        "${snapshot.key}: ${snapshot.value.toString()}")),
+                  leading: new CircleAvatar(
+                    backgroundImage:
+                        new NetworkImage(snapshot.value["userImage"]),
+                  ),
+                  title: new Text(snapshot.value["text"]),
+                  subtitle: new Text(snapshot.value["userName"]),
+                ),
               )),
+      floatingActionButton: new FloatingActionButton(
+        onPressed: () {
+          messages.push().set({
+            "userId": Platform.isAndroid ? "android_bot" : "ios_bot",
+            "userImage": Platform.isAndroid
+                ? "http://files.softicons.com/download/social-media-icons/simple-icons-by-dan-leech/ico/android.ico"
+                : "http://www.mobiflip.de/wp-content/uploads/2011/09/apple-logo9.jpg",
+            "userName": Platform.isAndroid ? "Android Bot" : "iOS Bot",
+            "timestamp": new DateTime.now().millisecondsSinceEpoch,
+            "text":
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+          });
+        },
+        child: new Icon(Icons.add),
+      ),
     );
   }
 }
