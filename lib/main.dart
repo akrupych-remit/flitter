@@ -1,9 +1,12 @@
-import 'dart:io' show Platform;
+import 'dart:async';
+import 'dart:io';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
-import 'package:flitter/message.dart';
 import 'package:flutter/material.dart';
+
+import 'compose.dart';
+import 'message.dart';
 
 void main() async {
   runApp(new MaterialApp(
@@ -21,6 +24,12 @@ class _MyHomePageState extends State<MyHomePage> {
   // reference to node "messages" in connected DB
   DatabaseReference messages =
       FirebaseDatabase.instance.reference().child("messages");
+
+  Future triggerBot() async {
+    messages.push().set(Platform.isAndroid
+        ? new AndroidBotMessage().toMap()
+        : new IOSBotMessage().toMap());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,11 +56,8 @@ class _MyHomePageState extends State<MyHomePage> {
             );
           }),
       floatingActionButton: new FloatingActionButton(
-        onPressed: () {
-          messages.push().set(Platform.isAndroid
-              ? new AndroidBotMessage().toMap()
-              : new IOSBotMessage().toMap());
-        },
+        onPressed: () =>
+            MaterialPageRoute(builder: (context) => ComposeScreen()),
         child: new Icon(Icons.add),
       ),
     );
