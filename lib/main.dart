@@ -4,8 +4,6 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flitter/message.dart';
 import 'package:flutter/material.dart';
-// import DB classes
-// auto-animated ListView listening DB changes
 
 void main() async {
   runApp(new MaterialApp(
@@ -40,18 +38,12 @@ class _MyHomePageState extends State<MyHomePage> {
           // ListView adapter
           itemBuilder: (BuildContext context, DataSnapshot snapshot,
               Animation<double> animation, int index) {
-            // parse DB object
-            Message message = new Message.fromSnapshot(snapshot);
             // make new items appear and deleted ones disappear with animation
             return new SizeTransition(
               sizeFactor: animation,
-              // use default ListView item widget
-              child: new ListTile(
-                leading: new CircleAvatar(
-                    backgroundImage: new NetworkImage(message.userImage)),
-                title: new Text(message.text),
-                subtitle: new Text(message.userName),
-              ),
+              // replace ListTile with a custom widget
+              child: new MessageWidget(
+                  message: new Message.fromSnapshot(snapshot)),
             );
           }),
       floatingActionButton: new FloatingActionButton(

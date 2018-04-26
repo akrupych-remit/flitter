@@ -1,4 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class Message {
   String userId;
@@ -25,6 +27,12 @@ class Message {
         "timestamp": timestamp,
         "text": text
       };
+
+  String getFormattedDateTime() {
+    DateTime dateTime = new DateTime.fromMillisecondsSinceEpoch(timestamp);
+    DateFormat formatter = new DateFormat.yMd().add_jm();
+    return formatter.format(dateTime);
+  }
 }
 
 class AndroidBotMessage extends Message {
@@ -49,4 +57,57 @@ class IOSBotMessage extends Message {
             timestamp: new DateTime.now().millisecondsSinceEpoch,
             text:
                 "Our vision has always been to create an iPhone that is entirely screen. One so immersive the device itself disappears into the experience. And so intelligent it can respond to a tap, your voice, and even a glance. With iPhone X, that vision is now a reality. Say hello to the future.");
+}
+
+// here's what a typical layout looks like
+class MessageWidget extends StatelessWidget {
+  final Message message;
+
+  MessageWidget({this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return new Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+      child: new Card(
+        child: new Column(
+          children: <Widget>[
+            new Row(
+              children: <Widget>[
+                new Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: new CircleAvatar(
+                    backgroundImage: new NetworkImage(message.userImage),
+                  ),
+                ),
+                new Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    new Text(
+                      message.userName,
+                      style: new TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    new Text(
+                      message.getFormattedDateTime(),
+                      style: new TextStyle(fontSize: 12.0, color: Colors.grey),
+                    )
+                  ],
+                )
+              ],
+            ),
+            new Padding(
+              padding:
+                  const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
+              child: new Text(
+                message.text,
+                maxLines: 4,
+                overflow: TextOverflow.ellipsis,
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
 }
