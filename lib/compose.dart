@@ -1,14 +1,13 @@
 import 'dart:io';
+import 'dart:async';
 
+import 'package:path/path.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_database/firebase_database.dart';
 
-void main() {
-  runApp(MaterialApp(
-    title: "Compose Message",
-    home: ComposeScreen(),
-  ));
-}
+import 'message.dart';
 
 class ComposeScreen extends StatefulWidget {
   @override
@@ -16,9 +15,25 @@ class ComposeScreen extends StatefulWidget {
 }
 
 class _ComposeScreenState extends State<ComposeScreen> {
-  File image;
 
-  void sendMessage() {}
+  File image;
+  TextEditingController inputController = new TextEditingController(text: null);
+
+  Future sendToFirebase() => uploadImage().then((imageUrl) => postMessage(imageUrl));
+
+  Future<String> uploadImage() {
+    if (image == null) return Future.value(null);
+    String fileName = basename(image.path);
+    return FirebaseStorage.instance.ref().child("images/$fileName").putFile(image).future
+          .then((snapshot) { return snapshot.downloadUrl.toString(); });
+  }
+
+  Future postMessage(String imageUrl) {
+    Message message = Platform.isAndroid ? new AndroidBotMessage() : new IOSBotMessage();
+    message.text = inputController.text;
+    message.imageUrl = imageUrl;
+    return FirebaseDatabase.instance.reference().child("messages").push().set(message.toMap());
+  }
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -31,23 +46,15 @@ class _ComposeScreenState extends State<ComposeScreen> {
             IconButton(
                 icon: Icon(Icons.photo_camera),
                 onPressed: () {
-                  ImagePicker
-                      .pickImage(source: ImageSource.camera)
-                      .then((file) {
-                    setState(() {
-                      image = file;
-                    });
+                  ImagePicker.pickImage(source: ImageSource.camera).then((file) {
+                    setState(() { image = file; });
                   });
                 }),
             IconButton(
                 icon: Icon(Icons.photo_library),
                 onPressed: () {
-                  ImagePicker
-                      .pickImage(source: ImageSource.gallery)
-                      .then((file) {
-                    setState(() {
-                      image = file;
-                    });
+                  ImagePicker.pickImage(source: ImageSource.gallery).then((file) {
+                    setState(() { image = file; });
                   });
                 }),
           ],
@@ -56,23 +63,33 @@ class _ComposeScreenState extends State<ComposeScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             Expanded(
-              child: image != null
-                  ? Image.file(
-                      image,
-                      fit: BoxFit.fitWidth,
-                    )
-                  : Container(),
+              child: new Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: image != null
+                    ? Container(
+                      decoration: BoxDecoration(
+                          borderRadius: new BorderRadius.circular(8.0),
+                          image: DecorationImage(
+                              image: new FileImage(image),
+                              fit: BoxFit.fitWidth
+                          )
+                      ))
+                    : Container(),
+              )
             ),
             Padding(
               padding: EdgeInsets.all(8.0),
               child: TextField(
                 maxLines: null,
                 autofocus: true,
+                controller: inputController,
                 decoration: InputDecoration(
                     hintText: "Type text here",
                     suffixIcon: IconButton(
                       icon: Icon(Icons.send),
-                      onPressed: sendMessage,
+                      onPressed: () {
+                        sendToFirebase().then((foo) => Navigator.pop(context));
+                      },
                     )),
               ),
             )

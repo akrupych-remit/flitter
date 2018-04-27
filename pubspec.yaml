@@ -8,6 +8,7 @@ dependencies:
   firebase_database: 0.4.6
   intl: 0.15.6
   image_picker: "^0.4.1"
+  firebase_storage: "^0.3.0"
 
 dev_dependencies:
   flutter_test:
