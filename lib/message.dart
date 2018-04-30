@@ -1,6 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'details.dart';
 
 class Message {
   String userId;
@@ -70,58 +71,75 @@ class MessageWidget extends StatelessWidget {
   Widget build(BuildContext context) => new Padding(
     padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
     child: new Card(
-      child: new Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          new Expanded(
-            child: new Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                new Row(
-                  children: <Widget>[
-                    new Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: new CircleAvatar(
-                          backgroundImage: new NetworkImage(message.userImage)
-                      ),
+      child: new InkWell(
+        onTap: () {
+          Navigator.push(context, new MaterialPageRoute(
+              builder: (context) => new DetailsPage(message: message)
+          ));
+        },
+        child: new Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            new Expanded(
+              child: new Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  new MessageInfoWidget(message: message),
+                  new Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
+                    child: new Text(
+                      message.text,
+                      maxLines: 4,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    new Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        new Text(
-                          message.userName,
-                          style: new TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        new Text(
-                          message.getFormattedDateTime(),
-                          style: new TextStyle(fontSize: 12.0, color: Colors.grey),
-                        )
-                      ],
-                    )
-                  ],
-                ),
-                new Padding(
-                  padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
-                  child: new Text(
-                    message.text,
-                    maxLines: 4,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                )
-              ],
+                  )
+                ],
+              ),
             ),
-          ),
-          message.imageUrl != null
-              ? new Expanded(
-                child: new ConstrainedBox(
-                  child: new Image.network(message.imageUrl, fit: BoxFit.fitWidth),
-                  constraints: new BoxConstraints.loose(new Size.fromHeight(130.0))
-                ))
-              : Container()
-        ],
+            message.imageUrl != null
+                ? new Expanded(
+                  child: new ConstrainedBox(
+                    child: new Image.network(message.imageUrl, fit: BoxFit.fitWidth),
+                    constraints: new BoxConstraints.loose(new Size.fromHeight(130.0))
+                  ))
+                : Container()
+          ],
+        ),
       ),
     ),
+  );
+}
+
+class MessageInfoWidget extends StatelessWidget {
+
+  final Message message;
+
+  MessageInfoWidget({ this.message });
+
+  @override
+  Widget build(BuildContext context) => new Row(
+    children: <Widget>[
+      new Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: new CircleAvatar(
+            backgroundImage: new NetworkImage(message.userImage)
+        ),
+      ),
+      new Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          new Text(
+            message.userName,
+            style: new TextStyle(fontWeight: FontWeight.bold),
+          ),
+          new Text(
+            message.getFormattedDateTime(),
+            style: new TextStyle(fontSize: 12.0, color: Colors.grey),
+          )
+        ],
+      )
+    ],
   );
 }
