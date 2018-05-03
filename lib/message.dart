@@ -36,6 +36,12 @@ class Message {
     DateFormat formatter = new DateFormat.yMd().add_jm();
     return formatter.format(dateTime);
   }
+
+  String getContentForSharing() {
+    String result = "$userName: $text";
+    if (imageUrl != null) result += " $imageUrl";
+    return result;
+  }
 }
 
 class AndroidBotMessage extends Message {

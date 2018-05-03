@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'message.dart';
+import 'package:share/share.dart';
 
 class DetailsPage extends StatelessWidget {
 
@@ -30,6 +31,12 @@ class DetailsPage extends StatelessWidget {
             )
             : new Container()
       ],
+    ),
+    floatingActionButton: new FloatingActionButton(
+        child: new Icon(Icons.share),
+        onPressed: () {
+          share(message.getContentForSharing());
+        }
     ),
   );
 }
