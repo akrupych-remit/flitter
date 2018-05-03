@@ -23,7 +23,10 @@ class DetailsPage extends StatelessWidget {
         message.imageUrl != null
             ? new Padding(
               padding: const EdgeInsets.all(16.0),
-              child: new Image.network(message.imageUrl),
+              child: new Hero(
+                tag: message.imageUrl.hashCode,
+                child: new Image.network(message.imageUrl),
+              ),
             )
             : new Container()
       ],

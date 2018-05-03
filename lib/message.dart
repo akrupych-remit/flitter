@@ -100,7 +100,10 @@ class MessageWidget extends StatelessWidget {
             message.imageUrl != null
                 ? new Expanded(
                   child: new ConstrainedBox(
-                    child: new Image.network(message.imageUrl, fit: BoxFit.fitWidth),
+                    child: new Hero(
+                      tag: message.imageUrl.hashCode,
+                      child: new Image.network(message.imageUrl, fit: BoxFit.fitWidth)
+                    ),
                     constraints: new BoxConstraints.loose(new Size.fromHeight(130.0))
                   ))
                 : Container()
