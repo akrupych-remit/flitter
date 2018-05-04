@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'compose.dart';
 import 'message.dart';
+import 'utils.dart';
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -16,6 +17,14 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
       title: Text("Flitter"),
+      actions: isIos(context)
+          ? <Widget>[
+            new IconButton(
+                icon: new Icon(Icons.add),
+                onPressed: _showComposeScreen
+            )
+          ]
+          : null
     ),
     body: FirebaseAnimatedList(
         query: FirebaseDatabase.instance.reference().child("messages"),
@@ -27,10 +36,15 @@ class _MyHomePageState extends State<MyHomePage> {
           child: MessageWidget(message: Message.fromSnapshot(snapshot)),
         )
     ),
-    floatingActionButton: FloatingActionButton(
-      onPressed: () => Navigator.push(context,
-          MaterialPageRoute(builder: (context) => ComposeScreen())),
-      child: Icon(Icons.add),
-    ),
+    floatingActionButton: isAndroid(context)
+      ? FloatingActionButton(
+        onPressed: _showComposeScreen,
+        child: Icon(Icons.add),
+      )
+      : null
   );
+
+  _showComposeScreen() {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => ComposeScreen()));
+  }
 }

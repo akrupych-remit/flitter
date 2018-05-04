@@ -2,6 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'details.dart';
+import 'utils.dart';
 
 class Message {
   String userId;
@@ -107,7 +108,8 @@ class MessageWidget extends StatelessWidget {
                 ? new Expanded(
                   child: new ConstrainedBox(
                     child: new Hero(
-                      tag: message.imageUrl.hashCode,
+                      // on iOS this hero won't find shared element on next screen
+                      tag: isAndroid(context) ? message.imageUrl.hashCode : message,
                       child: new Image.network(message.imageUrl, fit: BoxFit.fitWidth)
                     ),
                     constraints: new BoxConstraints.loose(new Size.fromHeight(130.0))

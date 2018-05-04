@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'message.dart';
 import 'package:share/share.dart';
+import 'utils.dart';
 
 class DetailsPage extends StatelessWidget {
 
@@ -10,7 +11,17 @@ class DetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => new Scaffold(
-    appBar: new AppBar(title: new Text("Message")),
+    appBar: new AppBar(
+      title: new Text("Message"),
+      actions: isIos(context)
+        ? <Widget>[
+          new IconButton(
+              icon: new Icon(Icons.share),
+              onPressed: _shareMessage
+          )
+        ]
+        : null
+    ),
     body: new ListView(
       children: <Widget>[
         new Padding(
@@ -32,11 +43,13 @@ class DetailsPage extends StatelessWidget {
             : new Container()
       ],
     ),
-    floatingActionButton: new FloatingActionButton(
+    floatingActionButton: isAndroid(context)
+      ? new FloatingActionButton(
         child: new Icon(Icons.share),
-        onPressed: () {
-          share(message.getContentForSharing());
-        }
-    ),
+        onPressed: _shareMessage
+      )
+      : null
   );
+
+  _shareMessage() => share(message.getContentForSharing());
 }
